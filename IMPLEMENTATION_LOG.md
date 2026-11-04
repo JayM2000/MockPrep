@@ -1,0 +1,45 @@
+# Implementation Log
+
+## 2026-11-04 — Milestone 0: Repository Audit and Foundation Setup
+- **Implemented:**
+  - Audited local environment (Node v22.16.0, npm 11.4.1, Graphify CLI, git initialized).
+  - Scaffolded Next.js 16 App Router project with TypeScript, ESLint, and Tailwind CSS v4.
+  - Initialized shadcn/ui with `@base-ui/react` primitives and installed initial UI components (`button`, `card`, `badge`, `dropdown-menu`, `separator`).
+  - Configured semantic CSS variables in `src/app/globals.css` supporting `light`, `dark`, and restrained `purple` accent themes without animation overhead.
+  - Implemented `QueryProvider` (`@tanstack/react-query`) with proper SSR/client singleton cache isolation.
+  - Implemented `ThemeProvider` (`next-themes`) and combined wrapper `AppProviders`.
+  - Created zero-render-cascade `ThemeToggle` component using `React.useSyncExternalStore`.
+  - Built clean, responsive public landing page in `src/app/page.tsx` with theme toggle and product overview.
+  - Created standardized directory skeleton (`components/`, `features/`, `hooks/`, `lib/`, `services/`, `types/`, `mocks/`).
+  - Configured and executed Graphify code graph indexing (`graphify update .`).
+  - Initialized project tracking files (`PROJECT_CONTEXT.md`, `IMPLEMENTATION_LOG.md`, `DECISIONS.md`).
+- **Files changed:**
+  - `package.json`
+  - `components.json`
+  - `.gitignore`
+  - `src/app/globals.css`
+  - `src/app/layout.tsx`
+  - `src/app/page.tsx`
+  - `src/components/providers/theme-provider.tsx`
+  - `src/components/providers/query-provider.tsx`
+  - `src/components/providers/index.tsx`
+  - `src/components/shared/theme-toggle.tsx`
+  - `src/components/ui/button.tsx`
+  - `src/components/ui/card.tsx`
+  - `src/components/ui/badge.tsx`
+  - `src/components/ui/dropdown-menu.tsx`
+  - `src/components/ui/separator.tsx`
+  - `src/lib/utils.ts`
+  - `PROJECT_CONTEXT.md`
+  - `IMPLEMENTATION_LOG.md`
+  - `DECISIONS.md`
+- **Validation:**
+  - `npm run lint`: Clean pass (0 errors, 0 warnings).
+  - `npm run build`: Production build with Turbopack compiled successfully in Next.js 16.4.5 with static page pre-rendering.
+  - `graphify update .`: Successfully generated knowledge graph with 34 nodes, 22 edges, and 14 communities.
+  - `graphify query`: Verified component relations for layout and provider hierarchy.
+- **Limitations:**
+  - Clerk credentials and middleware are not yet configured (Milestone 1).
+  - Backend services are not yet implemented; mock contracts to be introduced in Milestone 2.
+- **Next task:**
+  - Milestone 1: Authentication & Shell (Clerk setup, sign-in/sign-up flows, route protection, authenticated dashboard sidebar, header, and user navigation).
