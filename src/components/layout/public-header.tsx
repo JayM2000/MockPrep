@@ -1,8 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { BrandLogo } from "@/components/shared/brand-logo"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { SITE_CONFIG } from "@/lib/constants/site"
+import { PublicHeaderActions } from "./public-header-actions"
 
 export function PublicHeader() {
   return (
@@ -11,16 +9,7 @@ export function PublicHeader() {
         <BrandLogo />
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link href={SITE_CONFIG.routes.signIn}>
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-          </Link>
-          <Link href={SITE_CONFIG.routes.signUp}>
-            <Button size="sm">
-              Get Started
-            </Button>
-          </Link>
+          <PublicHeaderActions />
         </div>
       </div>
     </header>

@@ -21,6 +21,7 @@ export default function SignInPage() {
       </div>
       <Suspense fallback={<SignInFallback />}>
         <SignIn
+          fallbackRedirectUrl="/dashboard"
           appearance={{
             elements: {
               rootBox: "mx-auto shadow-none",

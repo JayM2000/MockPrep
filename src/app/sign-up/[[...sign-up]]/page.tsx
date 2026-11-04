@@ -21,6 +21,7 @@ export default function SignUpPage() {
       </div>
       <Suspense fallback={<SignUpFallback />}>
         <SignUp
+          fallbackRedirectUrl="/dashboard"
           appearance={{
             elements: {
               rootBox: "mx-auto shadow-none",
