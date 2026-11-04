@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { BrandLogo } from "@/components/shared/brand-logo"
 import { SidebarNav } from "./sidebar-nav"
 
@@ -11,7 +12,9 @@ export function AppSidebar() {
 
       {/* Navigation Items */}
       <div className="flex-1 overflow-y-auto py-4">
-        <SidebarNav />
+        <Suspense fallback={<div className="p-4 text-xs text-muted-foreground">Loading navigation...</div>}>
+          <SidebarNav />
+        </Suspense>
       </div>
 
       {/* Sidebar Footer info */}

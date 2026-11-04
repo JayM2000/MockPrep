@@ -2,7 +2,7 @@
 
 ## 1. Overview & Current Architecture
 - **Purpose:** AI-powered real-world engineering project and interview simulation platform.
-- **Current Milestone:** Milestone 1 (Authentication & Shell) completed. Next up: Milestone 2 (Dashboard & Projects).
+- **Current Milestone:** Milestone 2 (Dashboard & Projects) completed. Next up: Milestone 3 (Engineering Challenges).
 - **Core Principles:** Functional clarity, performance, maintainability. No visual clutter, no motion/animation effects, no gradients or glassmorphism.
 
 ## 2. Technology Stack & Versions
@@ -83,9 +83,23 @@ src/
 - **Header User Menu:** Renders `<UserButton />` when authenticated and a "Sign In" link when unauthenticated.
 - **Shell:** Desktop responsive sidebar + mobile accessible sheet drawer with dynamic breadcrumbs.
 
-## 5. Next Steps
-- Milestone 2: Dashboard & Projects.
-  - Implement typed mock project services in `src/services/projects/`.
-  - Wire up TanStack Query hooks for project listings and details.
-  - Build project list filters, search, sorting, and project card components.
-  - Build create-project modal/form with Zod validation.
+## 5. Dashboard & Projects Implementation (Milestone 2)
+- **Fixtures:** 5 realistic mock projects in `src/mocks/fixtures/projects.json` covering various complexities (beginner, intermediate, advanced) and states (ready, generating, draft).
+- **Service Layer:** `src/services/projects/project.service.ts` provides typed async operations with simulated network latency: `listProjects`, `getProjectById`, `createProject`, `updateProject`, `deleteProject`.
+- **Query Hooks:** `src/services/projects/project.queries.ts` (`useProjects`, `useProject`) and `src/services/projects/project.mutations.ts` (`useCreateProjectMutation`, `useDeleteProjectMutation`) with automatic cache invalidation.
+- **Validation:** `src/lib/validation/project.schema.ts` defining strict Zod schemas for creation and filtering.
+- **Components:** Modular UI components in `src/features/projects/components/`:
+  - `ProjectCard`, `ProjectStatusBadge`, `ProjectSkeletonGrid`
+  - `ProjectFiltersBar` with URL-driven search and filter state
+  - `CreateProjectForm` with multi-step generation simulation (submitting -> queued -> generating -> validating -> ready)
+  - `ProjectDetailView` with 4 tabs (Overview, Config, Challenges, Sessions)
+- **Pages:** `/dashboard` (live metrics & recent projects), `/projects` (filtered list), `/projects/new` (creator form), `/projects/[projectId]` (detail view with partial prerendering).
+
+## 6. Next Steps
+- Milestone 3: Engineering Challenges
+  - Typed mock challenge service in `src/services/challenges/`
+  - TanStack Query hooks: `useChallenges()`, `useChallenge()`, `useCreateChallengeMutation()`
+  - Challenge configuration form with distinct difficulty and severity fields
+  - Acceptance criteria list builder and AI permissions toggle
+  - Creator challenge review screen with hidden evaluation criteria isolation
+  - Challenge list & detail view under project tabs and dedicated routes

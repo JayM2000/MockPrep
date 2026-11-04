@@ -36,7 +36,9 @@ export function MobileSidebar() {
           <BrandLogo href="/dashboard" />
         </SheetHeader>
         <div className="flex-1 overflow-y-auto py-4">
-          <SidebarNav onNavigate={() => setOpen(false)} />
+          <React.Suspense fallback={null}>
+            <SidebarNav onNavigate={() => setOpen(false)} />
+          </React.Suspense>
         </div>
       </SheetContent>
     </Sheet>

@@ -15,12 +15,10 @@ export function ProjectFiltersBar() {
   const currentStatus = searchParams.get("status") ?? "all"
   const currentComplexity = searchParams.get("complexity") ?? "all"
 
+  // Use a key-driven pattern: when `currentSearch` changes externally (e.g. browser back/forward),
+  // the `key` on the form resets the local input state naturally — no useEffect sync needed.
   const [searchTerm, setSearchTerm] = React.useState(currentSearch)
-
-  // Sync state if URL changes externally
-  React.useEffect(() => {
-    setSearchTerm(currentSearch)
-  }, [currentSearch])
+  const searchInputKey = currentSearch
 
   const updateFilters = React.useCallback(
     (updates: Record<string, string | null>) => {
@@ -51,8 +49,8 @@ export function ProjectFiltersBar() {
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      {/* Search Input Form */}
-      <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
+      {/* Search Input Form — key resets local state when URL search param changes externally */}
+      <form key={searchInputKey} onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
         <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground pointer-events-none" />
         <Input
           type="text"

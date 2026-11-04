@@ -152,3 +152,64 @@
   - Mock project and session data will be fully populated in Milestone 2 and Milestone 4.
 - **Next task:**
   - Milestone 2: Dashboard and Projects (project list, filters, search, project creation form, project details tabs, typed mock service, and fixtures).
+
+
+## 2026-11-04 — Milestone 2: Dashboard and Projects Implementation
+- **Implemented:**
+  - Created fixture dataset with 5 diverse mock projects (`src/mocks/fixtures/projects.json`).
+  - Implemented typed asynchronous Project Service (`src/services/projects/project.service.ts`) supporting filtering, search, pagination, and CRUD with simulated network latency.
+  - Implemented TanStack Query hooks: `useProjects` & `useProject` queries, and `useCreateProjectMutation` & `useDeleteProjectMutation` with cache invalidation.
+  - Defined Zod schemas (`src/lib/validation/project.schema.ts`) for project creation and query filtering.
+  - Built modular UI components in `src/features/projects/components/`:
+    - `ProjectStatusBadge`: Semantic color badges for all project states.
+    - `ProjectCard`: Responsive card with status, metadata, tags, and action links.
+    - `ProjectSkeletonGrid`: Loading skeleton placeholders.
+    - `ProjectFiltersBar`: URL search params-driven search input and dropdown filters with zero-effect state reset.
+    - `ProjectList`: Query-backed reactive list with empty and error states.
+    - `ProjectGenerationStatus`: Multi-stage progress indicator simulating synthetic synthesis.
+    - `CreateProjectForm`: Validated form with simulated generation pipeline (`submitting` → `queued` → `generating` → `validating` → `ready`).
+    - `ProjectDetailView`: Tabbed container (Overview, Architecture Config, Challenges, Sessions).
+    - `ProjectOverviewTab`: Architecture details, repository stats, and tags.
+    - `ProjectConfigTab`: Readonly configuration inspection with copy-friendly formatting.
+    - `ProjectChallengesTab` & `ProjectSessionsTab`: Connected child tab placeholders.
+  - Wired routes:
+    - `/dashboard`: Real mock data aggregation for active projects, open sessions, and recent projects grid.
+    - `/projects`: Filtered project directory with URL synchronisation.
+    - `/projects/new`: Project creator page.
+    - `/projects/[projectId]`: Dynamic detail page with server-side async params resolution and Partial Prerendering boundary.
+  - Wrapped `SidebarNav` with Suspense in `AppSidebar` and `MobileSidebar` to prevent Next.js 16 prerendering client hook violations.
+- **Files changed:**
+  - `src/mocks/fixtures/projects.json`
+  - `src/services/projects/project.types.ts`
+  - `src/services/projects/project.service.ts`
+  - `src/services/projects/project.queries.ts`
+  - `src/services/projects/project.mutations.ts`
+  - `src/lib/validation/project.schema.ts`
+  - `src/features/projects/components/project-status-badge.tsx`
+  - `src/features/projects/components/project-card.tsx`
+  - `src/features/projects/components/project-skeleton.tsx`
+  - `src/features/projects/components/project-filters.tsx`
+  - `src/features/projects/components/project-list.tsx`
+  - `src/features/projects/components/project-generation-status.tsx`
+  - `src/features/projects/components/create-project-form.tsx`
+  - `src/features/projects/components/project-detail-view.tsx`
+  - `src/features/projects/components/project-overview-tab.tsx`
+  - `src/features/projects/components/project-config-tab.tsx`
+  - `src/features/projects/components/project-challenges-tab.tsx`
+  - `src/features/projects/components/project-sessions-tab.tsx`
+  - `src/components/layout/sidebar/app-sidebar.tsx`
+  - `src/components/layout/sidebar/mobile-sidebar.tsx`
+  - `src/app/(dashboard)/dashboard/page.tsx`
+  - `src/app/(dashboard)/projects/page.tsx`
+  - `src/app/(dashboard)/projects/new/page.tsx`
+  - `src/app/(dashboard)/projects/[projectId]/page.tsx`
+  - `PROJECT_CONTEXT.md`
+  - `IMPLEMENTATION_LOG.md`
+- **Validation:**
+  - `npm run lint`: Clean pass (0 errors, 0 warnings).
+  - `npm run build`: Production build with Turbopack compiled successfully across all 14 routes (Static + Partial Prerendering).
+  - `graphify update .`: Knowledge graph rebuilt to 173 nodes, 100 edges, 74 communities.
+- **Limitations:**
+  - Challenge service and creation flows are placeholders to be built in Milestone 3.
+- **Next task:**
+  - Milestone 3: Engineering Challenges (challenge listings, multi-type challenge creation, acceptance criteria builder, AI permissions configuration, and creator review screen with isolated evaluation criteria).

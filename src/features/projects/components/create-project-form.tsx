@@ -20,11 +20,11 @@ export function CreateProjectForm() {
 
   const [generationState, setGenerationState] = React.useState<ProjectStatus | null>(null)
   const [createdProjectId, setCreatedProjectId] = React.useState<string | null>(null)
+  const [projectName, setProjectName] = React.useState("Untitled Project")
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
@@ -41,7 +41,8 @@ export function CreateProjectForm() {
     },
   })
 
-  const projectName = watch("name") || "Untitled Project"
+  // Track project name for generation status display via controlled onChange
+  // instead of react-hook-form's `watch()` which breaks React Compiler memoization.
 
   const onSubmit = async (data: CreateProjectInput) => {
     try {
@@ -124,7 +125,10 @@ export function CreateProjectForm() {
             <Input
               id="name"
               placeholder="e.g. Distributed Payment Gateway"
-              {...register("name")}
+              {...register("name", {
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                  setProjectName(e.target.value || "Untitled Project"),
+              })}
               aria-invalid={Boolean(errors.name)}
             />
             {errors.name && (

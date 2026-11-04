@@ -27,3 +27,16 @@
 - **Alternatives Considered:**
   - Redux Toolkit by default (rejected per brief Section 5: Redux should only be added if a complex cross-feature client-state requirement is demonstrated).
 - **Consequences:** Lightweight client bundle, no duplicate state synchronization bugs.
+
+## ADR-004: Next.js 16 Partial Prerendering Boundaries & Dynamic Route Params
+- **Date:** 2026-11-04
+- **Status:** Accepted
+- **Context:** Next.js 16 enforces strict Partial Prerendering (PPR). Accessing runtime values such as `usePathname()`, `searchParams`, or un-awaited route `params` outside of a `<Suspense>` boundary triggers prerender errors.
+- **Decision:**
+  1. Wrap all navigation items that access `usePathname()` (`SidebarNav`, `Breadcrumbs`) inside `<Suspense>` boundaries with lightweight neutral fallbacks.
+  2. Implement dynamic page routes (`/projects/[projectId]`, `/join/[inviteCode]`) as Server Components that render a `<Suspense>` boundary wrapping an inner async component that awaits `params`.
+  3. Drive listing filters from URL search params via `useSearchParams()` with key-driven form state reset instead of `useEffect` setState cascading loops.
+- **Alternatives Considered:**
+  - `export const dynamic = "force-dynamic"` (rejected: disables static HTML caching for shared layout chrome).
+  - Synchronizing filter state in `useEffect` (rejected: triggers React 19 / ESLint `react-hooks/set-state-in-effect` errors).
+- **Consequences:** Deterministic static prerendering, instant shell navigation, zero render cascading warnings.

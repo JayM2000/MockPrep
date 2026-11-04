@@ -14,7 +14,7 @@ export const createProjectSchema = z.object({
   backendTech: z.string().min(2, "Backend technology is required"),
   database: z.string().min(2, "Database choice is required"),
   complexity: z.enum(["beginner", "intermediate", "advanced"], {
-    required_error: "Please select an engineering complexity",
+    message: "Please select an engineering complexity",
   }),
   generationNotes: z.string().max(300, "Notes cannot exceed 300 characters").optional(),
   tags: z.string().optional(),
