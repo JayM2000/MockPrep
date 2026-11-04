@@ -43,3 +43,55 @@
   - Backend services are not yet implemented; mock contracts to be introduced in Milestone 2.
 - **Next task:**
   - Milestone 1: Authentication & Shell (Clerk setup, sign-in/sign-up flows, route protection, authenticated dashboard sidebar, header, and user navigation).
+
+
+## 2026-11-04 — Structural & Architectural Best Practice Modularization
+- **Implemented:**
+  - Decomposed page components into small, highly cohesive, single-responsibility files.
+  - Extracted `useIsMounted` custom hook (`src/hooks/use-is-mounted.ts`) with barrel export.
+  - Created centralized constants: `src/lib/constants/theme.ts` (theme tokens, labels, defaults) and `src/lib/constants/site.ts` (navigation links, metadata).
+  - Established shared domain types: `src/types/common.types.ts` and `src/types/api.types.ts`.
+  - Built typed API client wrapper (`src/lib/api/client.ts`) and custom error hierarchy (`src/lib/api/errors.ts`).
+  - Extracted TanStack Query client singleton and defaults into `src/lib/query/client.ts`.
+  - Built centralized type-safe query key factories (`src/lib/query/query-keys.ts`) for projects, challenges, sessions, and user caches.
+  - Extracted reusable shared components: `BrandLogo` (`src/components/shared/brand-logo.tsx`), `PublicHeader`, `PublicFooter`.
+  - Created feature-level landing components: `HeroSection`, `FeatureCard`, `FeaturesGrid`, and feature types in `src/features/landing/`.
+  - Refactored `src/app/page.tsx` into a concise 20-line orchestrator.
+  - Established typed service contracts for projects (`project.types.ts`), challenges (`challenge.types.ts`), and sessions (`session.types.ts`).
+  - Fixed Next.js 16 static prerendering requirement for non-deterministic date values.
+- **Files changed:**
+  - `src/hooks/use-is-mounted.ts`
+  - `src/hooks/index.ts`
+  - `src/lib/constants/theme.ts`
+  - `src/lib/constants/site.ts`
+  - `src/types/common.types.ts`
+  - `src/types/api.types.ts`
+  - `src/types/index.ts`
+  - `src/lib/query/client.ts`
+  - `src/lib/query/query-keys.ts`
+  - `src/lib/api/errors.ts`
+  - `src/lib/api/client.ts`
+  - `src/components/providers/query-provider.tsx`
+  - `src/components/shared/theme-toggle.tsx`
+  - `src/components/shared/brand-logo.tsx`
+  - `src/components/layout/public-header.tsx`
+  - `src/components/layout/public-footer.tsx`
+  - `src/features/landing/types/landing.types.ts`
+  - `src/features/landing/data/features.ts`
+  - `src/features/landing/components/feature-card.tsx`
+  - `src/features/landing/components/features-grid.tsx`
+  - `src/features/landing/components/hero-section.tsx`
+  - `src/app/page.tsx`
+  - `src/services/projects/project.types.ts`
+  - `src/services/challenges/challenge.types.ts`
+  - `src/services/sessions/session.types.ts`
+  - `PROJECT_CONTEXT.md`
+  - `IMPLEMENTATION_LOG.md`
+- **Validation:**
+  - `npm run lint`: Clean pass (0 errors, 0 warnings).
+  - `npm run build`: Production static prerendering compiled successfully in Turbopack.
+  - `graphify update .`: Graph updated from 34 to 74 nodes, 41 edges, and 34 communities.
+- **Limitations:**
+  - Clerk auth integration is ready for implementation in Milestone 1.
+- **Next task:**
+  - Milestone 1: Clerk Authentication & App Shell.

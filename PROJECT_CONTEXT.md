@@ -2,7 +2,7 @@
 
 ## 1. Overview & Current Architecture
 - **Purpose:** AI-powered real-world engineering project and interview simulation platform.
-- **Current Milestone:** Milestone 0 (Repository Audit & Foundation) completed. Next up: Milestone 1 (Authentication & Shell).
+- **Current Milestone:** Milestone 0 (Repository Audit & Foundation) completed and hardened with modular architecture. Next up: Milestone 1 (Authentication & Shell).
 - **Core Principles:** Functional clarity, performance, maintainability. No visual clutter, no motion/animation effects, no gradients or glassmorphism.
 
 ## 2. Technology Stack & Versions
@@ -18,31 +18,41 @@
   - URL params: Filter, search, pagination
 - **Code Graph / Knowledge Base:** Graphify (`graphify update .`)
 
-## 3. Directory Layout
+## 3. Directory Layout & Architecture Boundaries
 ```text
 src/
   app/
     layout.tsx               # Root layout with font definitions and AppProviders
     globals.css              # Tailwind v4 semantic theme variables (light, dark, purple)
-    page.tsx                 # Public landing page with theme toggle & feature highlights
+    page.tsx                 # Clean orchestrator for landing page (under 25 lines)
   components/
-    ui/                      # shadcn primitives (button, dropdown-menu, card, badge, separator)
+    ui/                      # Standard shadcn primitives (button, dropdown-menu, card, badge, separator)
     providers/               # ThemeProvider, QueryProvider, and AppProviders
-    shared/                  # Shared components (ThemeToggle)
-    layout/                  # App shell, navigation, sidebar, headers
-    projects/                # Project domain components
-    challenges/              # Challenge domain components
-    sessions/                # Session & workspace domain components
-  features/                  # Domain feature logic, schemas, and state
-  hooks/                     # Custom React hooks
+    shared/                  # Shared components (ThemeToggle, BrandLogo)
+    layout/                  # Reusable layouts (PublicHeader, PublicFooter, AppSidebar, Header)
+    projects/                # Project UI components
+    challenges/              # Challenge UI components
+    sessions/                # Session & workspace UI components
+  features/                  # Domain feature logic, feature-specific components, schemas
+    landing/                 # Landing page components (HeroSection, FeaturesGrid, FeatureCard)
+    auth/                    # Auth feature components & guards
+    dashboard/               # Dashboard views & metric cards
+    projects/                # Project list, card, creation form
+    challenges/              # Challenge forms & review view
+    sessions/                # Session lifecycle & creator controls
+  hooks/                     # Custom React hooks (useIsMounted, etc.)
   lib/
+    constants/               # Immutable configurations (theme.ts, site.ts)
     utils.ts                 # Utility helpers (cn)
-    api/                     # API client boundaries
+    api/                     # Centralized API client & custom error classes (client.ts, errors.ts)
     auth/                    # Auth helpers & Clerk wrappers
-    query/                   # Centralized TanStack Query keys & client config
+    query/                   # Query client singleton & type-safe query key factories
     validation/              # Zod validation schemas
-  services/                  # Typed services for projects, challenges, and sessions
-  types/                     # Domain TypeScript contracts
+  services/                  # Typed service contracts & boundaries
+    projects/                # Project types and services
+    challenges/              # Challenge types and services
+    sessions/                # Session types and lifecycle services
+  types/                     # Shared TypeScript domain contracts (common.types.ts, api.types.ts)
   mocks/
     fixtures/                # Seed mock data for local prototyping
 ```

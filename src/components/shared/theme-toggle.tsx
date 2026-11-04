@@ -10,16 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-const emptySubscribe = () => () => {}
-
-function useIsMounted() {
-  return React.useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
-}
+import { useIsMounted } from "@/hooks"
+import { THEME_OPTIONS } from "@/lib/constants/theme"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -33,33 +25,39 @@ export function ThemeToggle() {
     )
   }
 
+  const renderIcon = () => {
+    switch (theme) {
+      case "dark":
+        return <Moon className="size-4" />
+      case "purple":
+        return <Palette className="size-4 text-primary" />
+      default:
+        return <Sun className="size-4" />
+    }
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={
-        <Button variant="outline" size="icon" aria-label="Toggle theme">
-          {theme === "dark" ? (
-            <Moon className="size-4" />
-          ) : theme === "purple" ? (
-            <Palette className="size-4 text-primary" />
-          ) : (
-            <Sun className="size-4" />
-          )}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      } />
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="icon" aria-label="Toggle theme">
+            {renderIcon()}
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+        }
+      />
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 size-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 size-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("purple")}>
-          <Palette className="mr-2 size-4" />
-          <span>Purple</span>
-        </DropdownMenuItem>
+        {THEME_OPTIONS.map((option) => (
+          <DropdownMenuItem
+            key={option.value}
+            onClick={() => setTheme(option.value)}
+          >
+            {option.value === "light" && <Sun className="mr-2 size-4" />}
+            {option.value === "dark" && <Moon className="mr-2 size-4" />}
+            {option.value === "purple" && <Palette className="mr-2 size-4" />}
+            <span>{option.label}</span>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )
