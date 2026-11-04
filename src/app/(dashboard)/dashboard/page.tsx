@@ -1,10 +1,21 @@
+"use client"
+
 import Link from "next/link"
 import { Plus, ArrowRight, FolderGit2, PlaySquare, Key } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useProjects } from "@/services/projects/project.queries"
+import { ProjectCard } from "@/features/projects/components/project-card"
 
 export default function DashboardPage() {
+  const { data: projects, isLoading } = useProjects({ sortBy: "updatedAt", sortOrder: "desc" })
+
+  const recentProjects = projects?.slice(0, 3) ?? []
+  const totalProjects = projects?.length ?? 0
+  const readyProjects = projects?.filter((p) => p.status === "ready").length ?? 0
+
   return (
     <div className="space-y-6">
       {/* Page Title & Quick Actions */}
@@ -31,7 +42,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Metrics Row (Sample Metrics clearly labeled) */}
+      {/* Metrics Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -39,8 +50,12 @@ export default function DashboardPage() {
             <FolderGit2 className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Ready for challenge generation</p>
+            {isLoading ? (
+              <Skeleton className="h-7 w-8" />
+            ) : (
+              <div className="text-2xl font-bold">{totalProjects}</div>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">{readyProjects} ready for challenges</p>
           </CardContent>
         </Card>
 
@@ -80,7 +95,7 @@ export default function DashboardPage() {
 
       {/* Sections Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Recent Projects Placeholder */}
+        {/* Recent Projects */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -93,8 +108,24 @@ export default function DashboardPage() {
               </Button>
             </Link>
           </CardHeader>
-          <CardContent className="py-8 text-center text-sm text-muted-foreground border-t border-border">
-            No projects created yet. Start by generating or importing your first project.
+          <CardContent className="border-t border-border pt-4">
+            {isLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-full rounded-md" />
+                ))}
+              </div>
+            ) : recentProjects.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No projects created yet. Start by generating or importing your first project.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {recentProjects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

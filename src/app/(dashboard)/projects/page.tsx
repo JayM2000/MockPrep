@@ -1,6 +1,12 @@
+"use client"
+
+import { Suspense } from "react"
 import Link from "next/link"
-import { Plus, FolderGit2 } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ProjectList } from "@/features/projects/components/project-list"
+import { ProjectFiltersBar } from "@/features/projects/components/project-filters"
+import { ProjectSkeletonGrid } from "@/features/projects/components/project-skeleton"
 
 export default function ProjectsPage() {
   return (
@@ -20,18 +26,13 @@ export default function ProjectsPage() {
         </Link>
       </div>
 
-      <div className="rounded-lg border border-dashed border-border p-12 text-center">
-        <FolderGit2 className="mx-auto size-10 text-muted-foreground/60" />
-        <h3 className="mt-4 text-base font-semibold">No projects yet</h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
-          Get started by describing a software project or choosing a starter template.
-        </p>
-        <div className="mt-6">
-          <Link href="/projects/new">
-            <Button size="sm">Create First Project</Button>
-          </Link>
-        </div>
-      </div>
+      <Suspense fallback={<div className="h-9 w-full bg-muted/20 rounded" />}>
+        <ProjectFiltersBar />
+      </Suspense>
+
+      <Suspense fallback={<ProjectSkeletonGrid count={6} />}>
+        <ProjectList />
+      </Suspense>
     </div>
   )
 }
