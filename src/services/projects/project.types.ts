@@ -33,10 +33,21 @@ export interface CreateProjectDto {
   database: string
   complexity: ProjectComplexity
   generationNotes?: string
+  tags?: string[]
 }
 
 export interface UpdateProjectDto {
   name?: string
   description?: string
   tags?: string[]
+  status?: ProjectStatus
+}
+
+export interface ProjectFilters {
+  search?: string
+  status?: ProjectStatus | "all"
+  category?: string
+  complexity?: ProjectComplexity | "all"
+  sortBy?: "updatedAt" | "name" | "createdAt"
+  sortOrder?: "asc" | "desc"
 }
