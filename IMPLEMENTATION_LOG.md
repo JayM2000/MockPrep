@@ -95,3 +95,60 @@
   - Clerk auth integration is ready for implementation in Milestone 1.
 - **Next task:**
   - Milestone 1: Clerk Authentication & App Shell.
+
+
+## 2026-11-04 — Milestone 1: Clerk Authentication & Authenticated Application Shell
+- **Implemented:**
+  - Installed and configured `@clerk/nextjs` (7.9.24).
+  - Created `.env.example` and local development `.env.local` with redirect rules and test keys.
+  - Configured `src/middleware.ts` with `clerkMiddleware` and `createRouteMatcher` protecting dashboard, project, session, and settings routes while keeping `/`, `/sign-in`, `/sign-up`, and `/join` public.
+  - Wrapped root layout with `<ClerkProvider>` while preserving `AppProviders` (ThemeProvider + QueryProvider).
+  - Built dedicated `/sign-in/[[...sign-in]]` and `/sign-up/[[...sign-up]]` pages wrapped in `<Suspense>` to support Next.js 16 Partial Prerendering.
+  - Created centralized navigation configuration (`src/config/navigation.ts`).
+  - Implemented modular authenticated sidebar components:
+    - `SidebarItem`: Active route highlights, badges, disabled states.
+    - `SidebarNav`: Client-side navigation rendering.
+    - `AppSidebar`: Desktop container with brand header and operational status footer.
+    - `MobileSidebar`: Accessible mobile drawer utilizing shadcn `Sheet`.
+  - Implemented modular header components:
+    - `Breadcrumbs`: Dynamic path segmentation and route hierarchy with Suspense streaming.
+    - `UserMenu`: Clerk `<UserButton />` with loading state and sign-in fallback.
+    - `AppHeader`: Unifies mobile trigger, breadcrumbs, theme switcher, and user menu.
+  - Built authenticated dashboard layout shell (`src/app/(dashboard)/layout.tsx`).
+  - Created protected page shells: `/dashboard`, `/projects`, `/sessions`, `/settings`.
+  - Created public invitation redemption page shells: `/join` and `/join/[inviteCode]`.
+  - Resolved RSC function serialization across Server-Client boundaries and Partial Prerendering dynamic parameter requirements.
+- **Files changed:**
+  - `package.json`
+  - `.env.example`
+  - `.env.local`
+  - `src/middleware.ts`
+  - `src/app/layout.tsx`
+  - `src/app/sign-in/[[...sign-in]]/page.tsx`
+  - `src/app/sign-up/[[...sign-up]]/page.tsx`
+  - `src/config/navigation.ts`
+  - `src/components/ui/sheet.tsx`
+  - `src/components/layout/sidebar/sidebar-item.tsx`
+  - `src/components/layout/sidebar/sidebar-nav.tsx`
+  - `src/components/layout/sidebar/app-sidebar.tsx`
+  - `src/components/layout/sidebar/mobile-sidebar.tsx`
+  - `src/components/layout/header/breadcrumbs.tsx`
+  - `src/components/layout/header/user-menu.tsx`
+  - `src/components/layout/header/app-header.tsx`
+  - `src/app/(dashboard)/layout.tsx`
+  - `src/app/(dashboard)/dashboard/page.tsx`
+  - `src/app/(dashboard)/projects/page.tsx`
+  - `src/app/(dashboard)/sessions/page.tsx`
+  - `src/app/(dashboard)/settings/page.tsx`
+  - `src/app/join/page.tsx`
+  - `src/app/join/[inviteCode]/page.tsx`
+  - `PROJECT_CONTEXT.md`
+  - `IMPLEMENTATION_LOG.md`
+- **Validation:**
+  - `npm run lint`: Clean pass (0 errors, 0 warnings).
+  - `npm run build`: Production build with Turbopack compiled successfully across all 12 routes (Static + Partial Prerender).
+  - `graphify update .`: Graph updated to 117 nodes, 66 edges, and 52 communities.
+- **Limitations:**
+  - Mock project and session data will be fully populated in Milestone 2 and Milestone 4.
+- **Next task:**
+  - Milestone 2: Dashboard and Projects (project list, filters, search, project creation form, project details tabs, typed mock service, and fixtures).
