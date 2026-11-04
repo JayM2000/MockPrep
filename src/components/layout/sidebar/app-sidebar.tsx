@@ -1,29 +1,25 @@
 import { Suspense } from "react"
 import { BrandLogo } from "@/components/shared/brand-logo"
 import { SidebarNav } from "./sidebar-nav"
+import { SidebarFooter } from "./sidebar-footer"
 
 export function AppSidebar() {
   return (
-    <aside className="hidden md:flex w-64 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
-      {/* Brand Header */}
-      <div className="flex h-14 items-center px-4 border-b border-sidebar-border">
+    <aside className="hidden md:flex w-64 shrink-0 flex-col h-screen h-dvh sticky top-0 border-r border-border bg-sidebar text-sidebar-foreground">
+      {/* Pinned Brand Header */}
+      <div className="flex h-14 shrink-0 items-center px-4 border-b border-sidebar-border">
         <BrandLogo href="/dashboard" />
       </div>
 
-      {/* Navigation Items */}
-      <div className="flex-1 overflow-y-auto py-4">
+      {/* Independently Scrollable Navigation Container */}
+      <div className="flex-1 min-h-0 overflow-y-auto py-4">
         <Suspense fallback={<div className="p-4 text-xs text-muted-foreground">Loading navigation...</div>}>
           <SidebarNav />
         </Suspense>
       </div>
 
-      {/* Sidebar Footer info */}
-      <div className="p-4 border-t border-sidebar-border text-xs text-muted-foreground">
-        <div className="flex items-center justify-between">
-          <span>Engine v1.0</span>
-          <span className="inline-block size-2 rounded-full bg-emerald-500" title="System Operational" />
-        </div>
-      </div>
+      {/* Pinned Engine Info Footer (Always at bottom) */}
+      <SidebarFooter />
     </aside>
   )
 }

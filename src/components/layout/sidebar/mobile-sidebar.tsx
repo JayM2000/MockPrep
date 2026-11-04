@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet"
 import { BrandLogo } from "@/components/shared/brand-logo"
 import { SidebarNav } from "./sidebar-nav"
+import { SidebarFooter } from "./sidebar-footer"
 
 export function MobileSidebar() {
   const [open, setOpen] = React.useState(false)
@@ -30,16 +31,22 @@ export function MobileSidebar() {
           </Button>
         }
       />
-      <SheetContent side="left" className="w-72 p-0 flex flex-col bg-sidebar">
-        <SheetHeader className="h-14 px-4 flex flex-row items-center border-b border-sidebar-border">
+      <SheetContent side="left" className="w-72 p-0 flex flex-col h-full bg-sidebar">
+        {/* Pinned Mobile Header */}
+        <SheetHeader className="h-14 shrink-0 px-4 flex flex-row items-center border-b border-sidebar-border">
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <BrandLogo href="/dashboard" />
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto py-4">
+
+        {/* Independently Scrollable Navigation Container */}
+        <div className="flex-1 min-h-0 overflow-y-auto py-4">
           <React.Suspense fallback={null}>
             <SidebarNav onNavigate={() => setOpen(false)} />
           </React.Suspense>
         </div>
+
+        {/* Pinned Engine Info Footer */}
+        <SidebarFooter />
       </SheetContent>
     </Sheet>
   )
