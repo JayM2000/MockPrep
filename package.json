@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:express": "npm --prefix MockPrep_Express run dev",
+    "dev:fastapi": "uv run --directory MockPrep_FastAPI fastapi dev",
+    "dev:services": "concurrently -n \"express,fastapi\" -c \"blue,green\" \"npm run dev:express\" \"npm run dev:fastapi\"",
+    "dev:all": "concurrently -n \"next,express,fastapi\" -c \"magenta,blue,green\" \"npm run dev\" \"npm run dev:express\" \"npm run dev:fastapi\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -30,6 +34,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^10.0.6",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "tailwindcss": "^4",
