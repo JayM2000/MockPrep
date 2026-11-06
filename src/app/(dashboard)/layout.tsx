@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server"
 import { AppSidebar } from "@/components/layout/sidebar/app-sidebar"
 import { AppHeader } from "@/components/layout/header/app-header"
 
@@ -5,7 +6,9 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+  await auth.protect()
+
   return (
     <div className="flex h-screen h-dvh w-full overflow-hidden bg-background text-foreground">
       <AppSidebar />
