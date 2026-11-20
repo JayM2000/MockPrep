@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "MockPrep_Express/**",
+    "MockPrep_FastAPI/**",
   ]),
 ]);
 

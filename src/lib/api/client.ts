@@ -1,16 +1,26 @@
 import { HttpError, AppError } from "./errors"
 
+/**
+ * Base URL for the Express API backend.
+ * NEXT_PUBLIC_ prefix makes it available in the browser bundle.
+ */
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_EXPRESS_API_URL || "http://localhost:4000"
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>
+  token?: string
 }
 
 export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { params, headers, ...rest } = options
+  const { params, headers, token, ...rest } = options
 
-  let url = endpoint
+  // If endpoint is a relative path (starts with /), prepend the backend base URL.
+  // Absolute URLs (http://...) are used as-is.
+  let url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`
   if (params) {
     const searchParams = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
@@ -24,10 +34,36 @@ export async function apiClient<T>(
     }
   }
 
+  // Resolve authorization token: explicitly passed > window.Clerk active session
+  let authToken = token
+  if (!authToken && typeof window !== "undefined") {
+    try {
+      const clerk = (
+        window as unknown as {
+          Clerk?: { session?: { getToken: () => Promise<string | null> } }
+        }
+      ).Clerk
+      if (clerk?.session) {
+        const sessionToken = await clerk.session.getToken()
+        if (sessionToken) {
+          authToken = sessionToken
+        }
+      }
+    } catch {
+      // Non-blocking if Clerk is initializing or in SSR
+    }
+  }
+
+  const authHeader: Record<string, string> = {}
+  if (authToken) {
+    authHeader["Authorization"] = `Bearer ${authToken}`
+  }
+
   try {
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
+        ...authHeader,
         ...headers,
       },
       ...rest,

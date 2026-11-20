@@ -1,29 +1,22 @@
-import rawProjects from "@/mocks/fixtures/projects.json"
+import { apiClient } from "@/lib/api/client"
 import type {
   Project,
   ProjectFilters,
   CreateProjectDto,
-  UpdateProjectDto,
+  ProjectBookmark,
 } from "./project.types"
 
-// In-memory mock store initialized from fixtures
-let mockProjects: Project[] = [...(rawProjects as Project[])]
-
-const SIMULATED_LATENCY_MS = 180
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
+/**
+ * Project service — talks to the Express API at /api/v1/projects and /api/v1/shared.
+ */
 export const projectService = {
   /**
-   * Fetches projects with optional client-side search, filtering, and sorting.
+   * Fetches projects from Express, then applies client-side search/filter/sort.
    */
   async listProjects(filters: ProjectFilters = {}): Promise<Project[]> {
-    await delay(SIMULATED_LATENCY_MS)
+    let results = await apiClient<Project[]>("/api/v1/projects")
 
-    let results = [...mockProjects]
-
+    // --- client-side search ---
     if (filters.search) {
       const q = filters.search.toLowerCase()
       results = results.filter(
@@ -34,14 +27,22 @@ export const projectService = {
       )
     }
 
+    // --- client-side status filter ---
     if (filters.status && filters.status !== "all") {
       results = results.filter((p) => p.status === filters.status)
     }
 
+    // --- client-side complexity filter ---
     if (filters.complexity && filters.complexity !== "all") {
       results = results.filter((p) => p.complexity === filters.complexity)
     }
 
+    // --- client-side visibility filter ---
+    if (filters.visibility && filters.visibility !== "all") {
+      results = results.filter((p) => p.visibility === filters.visibility)
+    }
+
+    // --- client-side sort ---
     const sortBy = filters.sortBy ?? "updatedAt"
     const order = filters.sortOrder ?? "desc"
 
@@ -50,9 +51,14 @@ export const projectService = {
       if (sortBy === "name") {
         comparison = a.name.localeCompare(b.name)
       } else if (sortBy === "createdAt") {
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        comparison =
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      } else if (sortBy === "expiresAt") {
+        comparison =
+          new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime()
       } else {
-        comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        comparison =
+          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
       }
       return order === "desc" ? -comparison : comparison
     })
@@ -61,64 +67,82 @@ export const projectService = {
   },
 
   /**
-   * Retrieves a single project by ID.
+   * Retrieves a single project by ID from Express.
    */
   async getProjectById(id: string): Promise<Project | null> {
-    await delay(SIMULATED_LATENCY_MS)
-    const project = mockProjects.find((p) => p.id === id)
-    return project ? { ...project } : null
+    try {
+      return await apiClient<Project>(`/api/v1/projects/${encodeURIComponent(id)}`)
+    } catch {
+      return null
+    }
   },
 
   /**
-   * Creates a new simulated project in the mock store.
+   * Creates a new project by POSTing to Express (Assessor only).
    */
   async createProject(dto: CreateProjectDto): Promise<Project> {
-    await delay(SIMULATED_LATENCY_MS + 200)
-
-    const now = new Date().toISOString()
-    const newProject: Project = {
-      id: `proj-${Date.now().toString(36)}`,
-      name: dto.name,
-      description: dto.description,
-      category: dto.category,
-      frontendTech: dto.frontendTech,
-      backendTech: dto.backendTech,
-      database: dto.database,
-      complexity: dto.complexity,
-      status: "ready", // Confirmed ready state
-      ownerId: "user_current",
-      tags: dto.tags && dto.tags.length > 0 ? dto.tags : [dto.category],
-      createdAt: now,
-      updatedAt: now,
-    }
-
-    mockProjects.unshift(newProject)
-    return { ...newProject }
+    return apiClient<Project>("/api/v1/projects", {
+      method: "POST",
+      body: JSON.stringify(dto),
+    })
   },
 
   /**
-   * Updates an existing project.
-   */
-  async updateProject(id: string, dto: UpdateProjectDto): Promise<Project | null> {
-    await delay(SIMULATED_LATENCY_MS)
-    const index = mockProjects.findIndex((p) => p.id === id)
-    if (index === -1) return null
-
-    mockProjects[index] = {
-      ...mockProjects[index],
-      ...dto,
-      updatedAt: new Date().toISOString(),
-    }
-    return { ...mockProjects[index] }
-  },
-
-  /**
-   * Deletes a project from the mock store.
+   * Deletes a project via Express (Assessor only).
    */
   async deleteProject(id: string): Promise<boolean> {
-    await delay(SIMULATED_LATENCY_MS)
-    const initialLen = mockProjects.length
-    mockProjects = mockProjects.filter((p) => p.id !== id)
-    return mockProjects.length < initialLen
+    try {
+      await apiClient<{ message: string }>(
+        `/api/v1/projects/${encodeURIComponent(id)}`,
+        { method: "DELETE" }
+      )
+      return true
+    } catch {
+      return false
+    }
+  },
+
+  /**
+   * Extends a project's expiry (Assessor only).
+   */
+  async renewProject(id: string, expiryDays: number): Promise<Project> {
+    return apiClient<Project>(`/api/v1/projects/${encodeURIComponent(id)}/renew`, {
+      method: "PATCH",
+      body: JSON.stringify({ expiryDays }),
+    })
+  },
+
+  /**
+   * Fetches a project via its unique share token (Candidate or Assessor).
+   */
+  async getSharedProject(shareToken: string): Promise<Project> {
+    return apiClient<Project>(`/api/v1/shared/${encodeURIComponent(shareToken)}`)
+  },
+
+  /**
+   * Adds a project bookmark for the current Candidate.
+   */
+  async bookmarkProject(projectId: string): Promise<ProjectBookmark> {
+    return apiClient<ProjectBookmark>(
+      `/api/v1/projects/${encodeURIComponent(projectId)}/bookmark`,
+      { method: "POST" }
+    )
+  },
+
+  /**
+   * Removes a bookmark for the current Candidate.
+   */
+  async removeBookmark(projectId: string): Promise<void> {
+    await apiClient(
+      `/api/v1/projects/${encodeURIComponent(projectId)}/bookmark`,
+      { method: "DELETE" }
+    )
+  },
+
+  /**
+   * Lists all bookmarks saved by the current Candidate.
+   */
+  async listBookmarks(): Promise<ProjectBookmark[]> {
+    return apiClient<ProjectBookmark[]>("/api/v1/projects/bookmarks")
   },
 }

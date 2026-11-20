@@ -3,7 +3,7 @@
 import * as React from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Share2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,6 +13,7 @@ import { ProjectOverviewTab } from "@/features/projects/components/project-overv
 import { ProjectConfigTab } from "@/features/projects/components/project-config-tab"
 import { ProjectChallengesTab } from "@/features/projects/components/project-challenges-tab"
 import { ProjectSessionsTab } from "@/features/projects/components/project-sessions-tab"
+import { ProjectShareModal } from "@/features/projects/components/project-share-modal"
 
 interface ProjectDetailViewProps {
   projectId: string
@@ -20,6 +21,7 @@ interface ProjectDetailViewProps {
 
 export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
   const { data: project, isLoading, isError } = useProject(projectId)
+  const [shareOpen, setShareOpen] = React.useState(false)
 
   if (isLoading) {
     return (
@@ -51,7 +53,24 @@ export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
           </div>
           <p className="text-sm text-muted-foreground pl-9">{project.category} · {project.complexity}</p>
         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 text-xs"
+            onClick={() => setShareOpen(true)}
+          >
+            <Share2 className="size-3.5 text-primary" />
+            Share & Invites
+          </Button>
+        </div>
       </div>
+
+      <ProjectShareModal
+        project={project}
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+      />
 
       {/* Tabbed Content */}
       <Tabs defaultValue="overview" className="w-full">

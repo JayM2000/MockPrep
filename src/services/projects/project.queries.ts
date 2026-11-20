@@ -17,3 +17,19 @@ export function useProject(id: string) {
     enabled: Boolean(id),
   })
 }
+
+export function useBookmarks() {
+  return useQuery({
+    queryKey: queryKeys.projects.bookmarks(),
+    queryFn: () => projectService.listBookmarks(),
+  })
+}
+
+export function useSharedProject(token: string) {
+  return useQuery({
+    queryKey: queryKeys.projects.shared(token),
+    queryFn: () => projectService.getSharedProject(token),
+    enabled: Boolean(token),
+    retry: false,
+  })
+}

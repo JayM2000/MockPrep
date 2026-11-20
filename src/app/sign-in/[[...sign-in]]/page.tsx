@@ -1,6 +1,4 @@
 import { Suspense } from "react"
-import { redirect } from "next/navigation"
-import { auth } from "@clerk/nextjs/server"
 import { SignIn } from "@clerk/nextjs"
 import { BrandLogo } from "@/components/shared/brand-logo"
 
@@ -15,12 +13,7 @@ function SignInFallback() {
   )
 }
 
-export default async function SignInPage() {
-  const { userId } = await auth()
-  if (userId) {
-    redirect("/dashboard")
-  }
-
+export default function SignInPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-muted/30">
       <div className="mb-6">

@@ -10,6 +10,7 @@ export type ProjectStatus =
   | "failed"
 
 export type ProjectComplexity = "beginner" | "intermediate" | "advanced"
+export type ProjectVisibility = "public" | "private"
 
 export interface Project extends BaseEntity {
   name: string
@@ -22,6 +23,10 @@ export interface Project extends BaseEntity {
   status: ProjectStatus
   ownerId: string
   tags: string[]
+  visibility: ProjectVisibility
+  shareToken?: string
+  expiryDays: number
+  expiresAt: string
 }
 
 export interface CreateProjectDto {
@@ -34,6 +39,8 @@ export interface CreateProjectDto {
   complexity: ProjectComplexity
   generationNotes?: string
   tags?: string[]
+  visibility?: ProjectVisibility
+  expiryDays?: number
 }
 
 export interface UpdateProjectDto {
@@ -41,6 +48,13 @@ export interface UpdateProjectDto {
   description?: string
   tags?: string[]
   status?: ProjectStatus
+  visibility?: ProjectVisibility
+}
+
+export interface ProjectBookmark {
+  id: string
+  projectId: string
+  createdAt: string
 }
 
 export interface ProjectFilters {
@@ -48,6 +62,7 @@ export interface ProjectFilters {
   status?: ProjectStatus | "all"
   category?: string
   complexity?: ProjectComplexity | "all"
-  sortBy?: "updatedAt" | "name" | "createdAt"
+  visibility?: ProjectVisibility | "all"
+  sortBy?: "updatedAt" | "name" | "createdAt" | "expiresAt"
   sortOrder?: "asc" | "desc"
 }

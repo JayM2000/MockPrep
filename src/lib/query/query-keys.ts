@@ -10,6 +10,8 @@ export const queryKeys = {
       [...queryKeys.projects.lists(), filters] as const,
     details: () => [...queryKeys.projects.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.projects.details(), id] as const,
+    bookmarks: () => [...queryKeys.projects.all, "bookmarks"] as const,
+    shared: (token: string) => [...queryKeys.projects.all, "shared", token] as const,
   },
   challenges: {
     all: ["challenges"] as const,

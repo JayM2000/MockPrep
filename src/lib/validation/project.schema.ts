@@ -18,6 +18,8 @@ export const createProjectSchema = z.object({
   }),
   generationNotes: z.string().max(300, "Notes cannot exceed 300 characters").optional(),
   tags: z.string().optional(),
+  visibility: z.enum(["public", "private"]),
+  expiryDays: z.number().min(1, "Minimum expiry is 1 day").max(30, "Maximum expiry is 30 days"),
 })
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>
@@ -26,6 +28,7 @@ export const projectFilterSchema = z.object({
   search: z.string().optional(),
   status: z.enum(["all", "draft", "submitting", "queued", "generating", "validating", "ready", "failed"]).optional(),
   complexity: z.enum(["all", "beginner", "intermediate", "advanced"]).optional(),
+  visibility: z.enum(["all", "public", "private"]).optional(),
 })
 
 export type ProjectFilterInput = z.infer<typeof projectFilterSchema>

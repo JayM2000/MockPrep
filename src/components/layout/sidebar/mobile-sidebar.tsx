@@ -24,7 +24,7 @@ export function MobileSidebar() {
           <Button
             variant="outline"
             size="icon"
-            className="md:hidden"
+            className="md:hidden size-9 shrink-0"
             aria-label="Open Navigation Menu"
           >
             <Menu className="size-4" />
@@ -32,14 +32,14 @@ export function MobileSidebar() {
         }
       />
       <SheetContent side="left" className="w-72 p-0 flex flex-col h-full bg-sidebar">
-        {/* Pinned Mobile Header */}
-        <SheetHeader className="h-14 shrink-0 px-4 flex flex-row items-center border-b border-sidebar-border">
+        {/* Pinned Mobile Header with dedicated space for close button */}
+        <SheetHeader className="h-14 shrink-0 px-4 pr-12 flex flex-row items-center border-b border-sidebar-border">
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-          <BrandLogo href="/dashboard" />
+          <BrandLogo href="/dashboard" showBadge={false} />
         </SheetHeader>
 
         {/* Independently Scrollable Navigation Container */}
-        <div className="flex-1 min-h-0 overflow-y-auto py-4">
+        <div className="flex-1 min-h-0 overflow-y-auto py-3">
           <React.Suspense fallback={null}>
             <SidebarNav onNavigate={() => setOpen(false)} />
           </React.Suspense>

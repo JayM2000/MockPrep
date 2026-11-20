@@ -3,6 +3,7 @@
 import * as React from "react"
 import { ThemeProvider } from "./theme-provider"
 import { QueryProvider } from "./query-provider"
+import { UserRoleProvider } from "@/context/user-role-context"
 
 interface AppProvidersProps {
   children: React.ReactNode
@@ -18,7 +19,9 @@ export function AppProviders({ children }: AppProvidersProps) {
       themes={["light", "dark", "purple"]}
     >
       <QueryProvider>
-        {children}
+        <UserRoleProvider>
+          {children}
+        </UserRoleProvider>
       </QueryProvider>
     </ThemeProvider>
   )

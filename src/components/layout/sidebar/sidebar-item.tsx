@@ -15,7 +15,9 @@ export function SidebarItem({ item, onNavigate }: SidebarItemProps) {
   const pathname = usePathname()
   const isActive =
     pathname === item.href ||
-    (item.href !== "/dashboard" && pathname.startsWith(item.href))
+    (item.href !== "/dashboard" &&
+      pathname.startsWith(`${item.href}/`) &&
+      !(item.href === "/projects" && pathname.startsWith("/projects/new")))
 
   const Icon = item.icon
 
