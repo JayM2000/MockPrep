@@ -8,6 +8,8 @@
     "dev:fastapi": "uv run --directory MockPrep_FastAPI fastapi dev",
     "dev:services": "concurrently -n \"express,fastapi\" -c \"blue,green\" \"npm run dev:express\" \"npm run dev:fastapi\"",
     "dev:all": "concurrently -n \"next,express,fastapi\" -c \"magenta,blue,green\" \"npm run dev\" \"npm run dev:express\" \"npm run dev:fastapi\"",
+    "db:reset": "npm --prefix MockPrep_Express run db:reset",
+    "db:migrate": "npm --prefix MockPrep_Express run migrate:app",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -26,6 +28,7 @@
     "react-dom": "19.3.0",
     "react-hook-form": "^7.91.0",
     "shadcn": "^4.23.0",
+    "socket.io-client": "^4.8.4",
     "tw-animate-css": "^1.4.0",
     "zod": "^4.6.7"
   },

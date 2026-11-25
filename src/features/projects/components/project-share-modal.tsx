@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { inviteService } from "@/services/invites/invite.service"
+import { useProjectRoom } from "@/context/socket-context"
 import type { Project } from "@/services/projects/project.types"
 import type { InviteStatus } from "@/types/invite.types"
 import { cn } from "@/lib/utils"
@@ -67,6 +68,9 @@ export function ProjectShareModal({
 }: ProjectShareModalProps) {
   const queryClient = useQueryClient()
   const isPublic = project?.visibility === "public"
+
+  // Automatically join project real-time room to receive live invite status updates
+  useProjectRoom(open && project?.id ? project.id : undefined)
 
   const [activeTab, setActiveTab] = React.useState<string>("email")
   const [emailsInput, setEmailsInput] = React.useState("")

@@ -54,7 +54,7 @@ export function InviteReviewView() {
     },
     onSuccess: (result) => {
       // Navigate to candidate session workspace
-      router.push(`/sessions?session_id=${result.sessionId}`)
+      router.push(`/sessions/${result.sessionId}`)
     },
   })
 
@@ -266,6 +266,17 @@ export function InviteReviewView() {
               </>
             )}
           </Button>
+        ) : !user ? (
+          <Link
+            href={`/sign-in?redirect_url=${encodeURIComponent(
+              typeof window !== "undefined" ? window.location.href : ""
+            )}`}
+          >
+            <Button size="sm" className="gap-2 font-semibold bg-primary text-primary-foreground min-w-[160px]">
+              <PlaySquare className="size-3.5" />
+              <span>Sign In to Accept & Start</span>
+            </Button>
+          </Link>
         ) : (
           <Button
             size="sm"

@@ -4,6 +4,7 @@ import * as React from "react"
 import { ThemeProvider } from "./theme-provider"
 import { QueryProvider } from "./query-provider"
 import { UserRoleProvider } from "@/context/user-role-context"
+import { SocketProvider } from "@/context/socket-context"
 
 interface AppProvidersProps {
   children: React.ReactNode
@@ -19,9 +20,11 @@ export function AppProviders({ children }: AppProvidersProps) {
       themes={["light", "dark", "purple"]}
     >
       <QueryProvider>
-        <UserRoleProvider>
-          {children}
-        </UserRoleProvider>
+        <SocketProvider>
+          <UserRoleProvider>
+            {children}
+          </UserRoleProvider>
+        </SocketProvider>
       </QueryProvider>
     </ThemeProvider>
   )

@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
 import {
   Clock,
   Layers,
@@ -12,15 +13,22 @@ import {
   Lock,
   Globe,
   Compass,
+  PlaySquare,
+  ShieldAlert,
+  Loader2,
+  LogIn,
+  UserCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSharedProject } from "@/services/projects/project.queries"
+import { useJoinSessionMutation } from "@/services/sessions/session.queries"
 import { inviteService } from "@/services/invites/invite.service"
 import { BrandLogo } from "@/components/shared/brand-logo"
 import { useCurrentTime } from "@/hooks/use-current-time"
+import { useUserRole } from "@/context/user-role-context"
 
 interface SharedProjectViewProps {
   shareToken: string
@@ -28,8 +36,13 @@ interface SharedProjectViewProps {
 
 export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
   const router = useRouter()
+  const { user, isSignedIn, isLoaded: isUserLoaded } = useUser()
+  const { isAssessor, setRole } = useUserRole()
   const { data: project, isLoading, error } = useSharedProject(shareToken)
   const now = useCurrentTime()
+
+  const joinMutation = useJoinSessionMutation()
+  const candidateEmail = user?.primaryEmailAddress?.emailAddress
 
   // Seamless redirect: if this token is actually an invite token, forward to /invite/[token]
   React.useEffect(() => {
@@ -47,7 +60,7 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
     }
   }, [error, shareToken, router])
 
-  if (isLoading) {
+  if (isLoading || !isUserLoaded) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-xl space-y-4">
@@ -98,6 +111,18 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
   // Calculate days remaining
   const expiresAt = new Date(project.expiresAt).getTime()
   const diffDays = now ? Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24)) : project.expiryDays
+  const isExpired = Boolean(now && diffDays <= 0)
+
+  const handleStartCandidateAssessment = () => {
+    joinMutation.mutate(
+      { code: shareToken, candidateEmail },
+      {
+        onSuccess: (session) => {
+          router.push(`/sessions/${session.id}`)
+        },
+      }
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
@@ -111,6 +136,24 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
           </Badge>
         </div>
 
+        {/* Assessor Notice banner if signed in as Assessor */}
+        {isSignedIn && isAssessor && (
+          <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-500/10 text-xs space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-semibold text-amber-900 dark:text-amber-200">
+                <ShieldAlert className="size-4 text-amber-500 shrink-0" />
+                <span>Assessor Studio Preview</span>
+              </div>
+              <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 text-[10px]">
+                Assessor Logged In
+              </Badge>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              You are currently signed in as an <strong>Assessor</strong>. Candidate users opening this link will see this challenge specification and click <strong>Accept & Start Assessment</strong> to launch their live assessment environment.
+            </p>
+          </div>
+        )}
+
         {/* Project Overview Card */}
         <Card className="border-2 border-border/80 shadow-lg">
           <CardHeader className="space-y-3 pb-4">
@@ -122,7 +165,7 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
                 {project.visibility === "public" ? (
                   <Badge variant="outline" className="text-[10px] gap-1 border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                     <Globe className="size-2.5" />
-                    Public
+                    Public Challenge
                   </Badge>
                 ) : (
                   <Badge variant="outline" className="text-[10px] gap-1 border-muted-foreground/30 text-muted-foreground">
@@ -133,11 +176,15 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
               </div>
 
               <Badge
-                variant="outline"
-                className="text-xs gap-1 border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10"
+                variant={isExpired ? "destructive" : "outline"}
+                className={`text-xs gap-1 ${
+                  isExpired
+                    ? ""
+                    : "border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10"
+                }`}
               >
                 <Clock className="size-3" />
-                Expires in {diffDays} {diffDays === 1 ? "day" : "days"}
+                {isExpired ? "Expired" : `Expires in ${diffDays} ${diffDays === 1 ? "day" : "days"}`}
               </Badge>
             </div>
 
@@ -155,15 +202,15 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 p-3.5 rounded-lg border border-border bg-muted/20 text-xs">
               <div>
                 <span className="text-muted-foreground block text-[11px]">Frontend</span>
-                <span className="font-semibold text-foreground truncate block">{project.frontendTech}</span>
+                <span className="font-semibold text-foreground truncate block">{project.frontendTech || "Modern Frontend"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground block text-[11px]">Backend</span>
-                <span className="font-semibold text-foreground truncate block">{project.backendTech}</span>
+                <span className="font-semibold text-foreground truncate block">{project.backendTech || "REST API"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground block text-[11px]">Database</span>
-                <span className="font-semibold text-foreground truncate block">{project.database}</span>
+                <span className="font-semibold text-foreground truncate block">{project.database || "PostgreSQL"}</span>
               </div>
             </div>
 
@@ -179,25 +226,73 @@ export function SharedProjectView({ shareToken }: SharedProjectViewProps) {
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="pt-3 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Assessment Session Activation Footer */}
+            <div className="pt-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Layers className="size-3.5" />
-                <span>Ready for interview challenge simulation</span>
+                <span>2-Hour Live Assessment Environment</span>
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Link href="/dashboard" className="flex-1 sm:flex-initial">
-                  <Button variant="outline" size="sm" className="w-full text-xs">
-                    Dashboard
+                {!isSignedIn ? (
+                  <Link
+                    href={`/sign-in?redirect_url=${encodeURIComponent(
+                      typeof window !== "undefined" ? window.location.href : ""
+                    )}`}
+                    className="w-full sm:w-auto"
+                  >
+                    <Button size="sm" className="w-full gap-2 text-xs font-semibold bg-primary text-primary-foreground">
+                      <LogIn className="size-3.5" />
+                      <span>Sign In as Candidate to Start</span>
+                    </Button>
+                  </Link>
+                ) : isAssessor ? (
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="text-xs gap-1.5 bg-primary text-primary-foreground"
+                      onClick={async () => {
+                        await setRole("candidate")
+                        handleStartCandidateAssessment()
+                      }}
+                      disabled={joinMutation.isPending || isExpired}
+                    >
+                      {joinMutation.isPending ? (
+                        <Loader2 className="size-3 animate-spin" />
+                      ) : (
+                        <PlaySquare className="size-3" />
+                      )}
+                      <span>Switch to Candidate & Start</span>
+                    </Button>
+                    <Link href={`/projects/${project.id}`}>
+                      <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                        <span>Manage in Studio</span>
+                        <ArrowRight className="size-3" />
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <Button
+                    size="sm"
+                    className="w-full sm:w-auto gap-2 text-xs font-semibold bg-primary text-primary-foreground"
+                    onClick={handleStartCandidateAssessment}
+                    disabled={joinMutation.isPending || isExpired}
+                  >
+                    {joinMutation.isPending ? (
+                      <>
+                        <Loader2 className="size-3.5 animate-spin" />
+                        <span>Initializing Environment...</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlaySquare className="size-3.5" />
+                        <span>Accept & Start Assessment</span>
+                        <ArrowRight className="size-3.5" />
+                      </>
+                    )}
                   </Button>
-                </Link>
-                <Link href={`/projects/${project.id}`} className="flex-1 sm:flex-initial">
-                  <Button size="sm" className="w-full gap-2 text-xs">
-                    <span>Enter Project</span>
-                    <ArrowRight className="size-3.5" />
-                  </Button>
-                </Link>
+                )}
               </div>
             </div>
           </CardContent>

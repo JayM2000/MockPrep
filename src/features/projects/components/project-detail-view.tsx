@@ -14,12 +14,14 @@ import { ProjectConfigTab } from "@/features/projects/components/project-config-
 import { ProjectChallengesTab } from "@/features/projects/components/project-challenges-tab"
 import { ProjectSessionsTab } from "@/features/projects/components/project-sessions-tab"
 import { ProjectShareModal } from "@/features/projects/components/project-share-modal"
+import { useProjectRoom } from "@/context/socket-context"
 
 interface ProjectDetailViewProps {
   projectId: string
 }
 
 export function ProjectDetailView({ projectId }: ProjectDetailViewProps) {
+  useProjectRoom(projectId)
   const { data: project, isLoading, isError } = useProject(projectId)
   const [shareOpen, setShareOpen] = React.useState(false)
 
